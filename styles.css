@@ -10,7 +10,6 @@ body {
     background-color: rgb(255, 207, 117);
     padding: 10px;
 }
-
 .input-area {
     text-align: center;
     display: flex;
@@ -39,6 +38,7 @@ ul {
 li {
     display: flex;
     justify-content: space-between;
+    /* justify-content: space-around; */
     align-items: center;
     background-color: wheat;
     margin-top: 5px;
@@ -46,6 +46,7 @@ li {
 }
 li button {
     background-color: #ff0000;
+    /* text-align: end; */
     border: none;
     border-radius: 5px;
     color: white;
@@ -56,4 +57,10 @@ li button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+}
+.save-btn {
+    background-color: green;
+}
+.edit-btn {
+    background-color: #499DD0;
 }
