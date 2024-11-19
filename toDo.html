@@ -9,8 +9,16 @@
 <body>
     <div class="body-wrap">
         <h1>Trents Todo List</h1>
+        <div id="error-message"></div>
         <div class="input-area">
             <input type="text" id="newTaskInput" placeholder="Enter a new task...">
+            <select name="selectCategory" id="selectCategory" required>
+                <option disabled selected value>--Select Category--</option>
+                <option value="Work">Work</option>
+                <option value="School">School</option>
+                <option value="Health">Health</option>
+                <option value="Other">Other</option>
+            </select>
             <button id="addTaskBtn">Add New Todo</button>
         </div>
 

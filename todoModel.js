@@ -209,22 +209,35 @@ function renderTasks() {
 
 addTaskBtn.addEventListener('click', () => {
     const newTask = newTaskInput.value.trim();
-    if (newTask !== '') {
-        tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: "Other" });
-        newTaskInput.value = '';
-        renderTasks();
-        console.log(renderTasks())
+    const selectedCategory = document.getElementById('selectCategory').value;
+    const errorMessageDiv = document.getElementById('error-message');
+    if (newTask !== '' && selectedCategory !== '') {
+        tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: selectedCategory });
+        newTaskInput.value = ''; 
+        document.getElementById('selectCategory').value = ''; 
+        renderTasks(); 
+
+        errorMessageDiv.style.display = 'none';
+    } else {
+        errorMessageDiv.textContent = "Please enter a task and select a category!";
+        errorMessageDiv.style.display = 'block'; 
     }
 });
 // enter key works here
 newTaskInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        const newTask = newTaskInput.value.trim();
-        if (newTask !== '') {
-            tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: "Other" });
-            newTaskInput.value = ''; // Clear the input field
-            renderTasks();
-        }
+    const newTask = newTaskInput.value.trim();
+    const selectedCategory = document.getElementById('selectCategory').value;
+    const errorMessageDiv = document.getElementById('error-message');
+    if (event.key === 'Enter' && newTask !== '' && selectedCategory !== '') {
+        tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: selectedCategory });
+        newTaskInput.value = ''; 
+        document.getElementById('selectCategory').value = ''; 
+        renderTasks(); 
+
+        errorMessageDiv.style.display = 'none';
+    } else if (event.key === 'Enter') {
+        errorMessageDiv.textContent = "Please enter a task and select a category!";
+        errorMessageDiv.style.display = 'block'; 
     }
 });
 
