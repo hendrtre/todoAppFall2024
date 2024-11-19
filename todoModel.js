@@ -36,13 +36,23 @@ const taskList = document.getElementById('taskList');
 const newTaskInput = document.getElementById('newTaskInput');
 const addTaskBtn = document.getElementById('addTaskBtn');
 const completedTaskList = document.getElementById('completedTaskList');
+const sortCategory = document.getElementById('sortCategory');
+
+sortCategory.addEventListener('change', renderTasks);
 
 
 function renderTasks() {
     taskList.innerHTML = ''; // Clear existing tasks
     completedTaskList.innerHTML = ''; // Clear existing completed tasks
 
-    tasks.forEach(task => {
+    const selectedCategory = sortCategory.value;
+    let uncompletedTasks = tasks.filter(task => {
+        return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
+    });
+    uncompletedTasks.sort((a, b) => a.name.localeCompare(b.name));
+
+    // tasks.forEach(task => {
+    uncompletedTasks.forEach(task => {
         const li = document.createElement('li');
 
         // Toggle checkbox for complete status
@@ -54,7 +64,6 @@ function renderTasks() {
             renderTasks(); // Re-render after status change
         });     
 
-
         // #### EDIT IN LINE WITH SPAN ####
         const taskName = document.createElement('span');
         taskName.textContent = task.name;
@@ -63,9 +72,9 @@ function renderTasks() {
             taskName.style.textDecoration = 'line-through'; 
         }
 
-        // Container for task text and checkbox, align them to the left
+        // Container for task text and checkbox
         const taskTextContainer = document.createElement('div');
-        taskTextContainer.classList.add('task-text'); // Add a class to style it
+        taskTextContainer.classList.add('task-text'); 
         taskTextContainer.appendChild(toggleCheckbox);
         taskTextContainer.appendChild(taskName);
 
@@ -125,12 +134,76 @@ function renderTasks() {
         li.appendChild(deleteBtn);
 
         // append to the appropriate list if complete or uncompleted
-        if (task.complete) {
-            completedTaskList.appendChild(li); 
-        } else {
-            taskList.appendChild(li); 
-        }
-        // taskList.appendChild(li);
+        // if (task.complete) {
+        //     completedTaskList.appendChild(li); 
+        // } else {
+        //     taskList.appendChild(li); 
+        // }
+        taskList.appendChild(li);
+        
+    });
+    // ############ BASICALLY A COPY PASTE FROM ABOVE TO MAKE THE 
+    // ############ UNCOMPLETE WORK SEPERATELY FROM THE COMPLETE
+    // ############ SECTION, YET STILL BE ABLE TO INTERACT WITH EACH OTHER. 
+    // ############ TOOK WAY TO LONG BUT WORK IT. 
+    const completedTasks = tasks.filter(task => task.complete);
+
+    completedTasks.forEach(task => {
+        const li = document.createElement('li');
+
+        const toggleCheckbox = document.createElement('input');
+        toggleCheckbox.type = 'checkbox';
+        toggleCheckbox.checked = task.complete;
+        toggleCheckbox.addEventListener('change', () => {
+            task.complete = toggleCheckbox.checked; 
+            renderTasks(); 
+        });
+
+        const taskName = document.createElement('span');
+        taskName.textContent = task.name;
+        taskName.style.textDecoration = 'line-through'; 
+
+        const taskTextContainer = document.createElement('div');
+        taskTextContainer.classList.add('task-text');
+        taskTextContainer.appendChild(toggleCheckbox);
+        taskTextContainer.appendChild(taskName);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.classList.add('edit-btn');
+        editBtn.addEventListener('click', () => {
+            const inputField = document.createElement('input');
+            inputField.value = task.name;
+            li.insertBefore(inputField, taskName);
+            li.removeChild(taskName);
+
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Save';
+            saveBtn.classList.add('save-btn');
+            saveBtn.addEventListener('click', () => {
+                const newName = inputField.value.trim();
+                if (newName !== '') {
+                    task.name = newName;
+                    renderTasks(); 
+                }
+            });
+
+            li.appendChild(saveBtn);
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+            tasks = tasks.filter(t => t !== task);
+            renderTasks(); 
+        });
+
+        li.appendChild(toggleCheckbox);
+        li.appendChild(taskName);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+
+        completedTaskList.appendChild(li);
     });
 }
 
