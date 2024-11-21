@@ -31,7 +31,21 @@
                 <option value="Health">Health</option>
                 <option value="Other">Other</option>
             </select>
+            <button id="editCategories">Edit Categories</button>
         </div>
+
+        <div id="categoryForm" style="display: none;">
+            <h3>Edit Categories</h3>
+            <ul id="categoryList">
+                <li>Work <button class="deleteCategoryBtn">Delete</button></li>
+                <li>School <button class="deleteCategoryBtn">Delete</button></li>
+                <li>Health <button class="deleteCategoryBtn">Delete</button></li>
+                <li>Other <button class="deleteCategoryBtn">Delete</button></li>
+            </ul>
+            <input type="text" id="newCategoryInput" placeholder="Add a new category...">
+            <button id="addCategoryBtn">Add Category</button>
+            <button id="saveCategoryBtn">Save</button>
+        </div>        
         
         <div class="uncomplete">
             <h3>Uncompleted</h3>

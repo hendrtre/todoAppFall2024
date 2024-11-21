@@ -46,10 +46,13 @@ function renderTasks() {
     completedTaskList.innerHTML = ''; // Clear existing completed tasks
 
     const selectedCategory = sortCategory.value;
-    let uncompletedTasks = tasks.filter(task => {
+    // let uncompletedTasks = tasks.filter(task => {
+    //     return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
+    // });
+    // uncompletedTasks.sort((a, b) => a.name.localeCompare(b.name));
+    const uncompletedTasks = tasks.filter(task => {
         return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
     });
-    uncompletedTasks.sort((a, b) => a.name.localeCompare(b.name));
 
     // tasks.forEach(task => {
     uncompletedTasks.forEach(task => {
@@ -61,7 +64,7 @@ function renderTasks() {
         toggleCheckbox.checked = task.complete;
         toggleCheckbox.addEventListener('change', () => {
             task.complete = toggleCheckbox.checked; // Update the complete status
-            renderTasks(); // Re-render after status change
+            renderTasks(); 
         });     
 
         // #### EDIT IN LINE WITH SPAN ####
@@ -240,6 +243,110 @@ newTaskInput.addEventListener('keydown', (event) => {
         errorMessageDiv.style.display = 'block'; 
     }
 });
+
+// ############# ADD, EDIT, AND DELETE CATEGORIES #############
+
+let categories = ["Work", "School", "Health", "Other"]; 
+const categoryForm = document.getElementById('categoryForm');
+const categoryList = document.getElementById('categoryList');
+const newCategoryInput = document.getElementById('newCategoryInput');
+const addCategoryBtn = document.getElementById('addCategoryBtn');
+const editCategoriesBtn = document.getElementById('editCategories');
+const saveCategoryBtn = document.getElementById('saveCategoryBtn');
+
+// Show/hide the category form
+editCategoriesBtn.addEventListener('click', () => {
+    categoryForm.style.display = categoryForm.style.display === 'none' ? 'block' : 'none';
+    renderCategories();
+});
+
+saveCategoryBtn.addEventListener('click', () => {
+    categoryForm.style.display = 'none'; 
+});
+
+// Render categories 
+function renderCategories() {
+    categoryList.innerHTML = ''; 
+    categories.forEach(category => {
+        const li = document.createElement('li');
+        // li.textContent = category;
+
+        const categoryName = document.createElement('span');
+        categoryName.textContent = category;
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.classList.add('editCategoryBtn');
+        editBtn.addEventListener('click', () => {
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.value = category;
+
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Save';
+            saveBtn.classList.add('saveEditBtn');
+            saveBtn.addEventListener('click', () => {
+                const newCategoryName = inputField.value.trim();
+                if (newCategoryName && !categories.includes(newCategoryName)) {
+                    categories = categories.map(cat => (cat === category ? newCategoryName : cat));
+                    renderCategories(); // Update the list
+                }
+            });
+
+            li.replaceChild(inputField, categoryName); // Replace text with input
+            li.replaceChild(saveBtn, editBtn); // Replace Edit button with Save
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.classList.add('deleteCategoryBtn');
+        deleteBtn.addEventListener('click', () => {
+            categories = categories.filter(cat => cat !== category);
+            renderCategories(); 
+        });
+
+        li.appendChild(categoryName);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        categoryList.appendChild(li);
+    });
+
+    updateCategoryDropdowns();
+}
+
+// Add a new category
+addCategoryBtn.addEventListener('click', () => {
+    const newCategory = newCategoryInput.value.trim();
+    if (newCategory && !categories.includes(newCategory)) {
+        categories.push(newCategory);
+        newCategoryInput.value = ''; 
+        renderCategories();
+    }
+});
+
+document.getElementById('categoryList').addEventListener('click', (e) => {
+    if (e.target.classList.contains('deleteCategoryBtn')) {
+        const category = e.target.parentNode.textContent.trim();
+        categories = categories.filter(cat => cat !== category);
+        renderCategories();
+    }
+});
+
+// Update dropdowns dynamically
+function updateCategoryDropdowns() {
+    const selectCategory = document.getElementById('selectCategory');
+    const sortCategory = document.getElementById('sortCategory');
+    [selectCategory, sortCategory].forEach(dropdown => {
+        dropdown.innerHTML = `<option value="allCategory">-All Categories-</option>`; // Ensure "allCategory" is the first option
+        categories.forEach(category => {
+            dropdown.innerHTML += `<option value="${category}">${category}</option>`;
+        });
+    });
+}
+
+// Initial rendering
+renderCategories();
+
 
 // Initial rendering
 renderTasks();
