@@ -30,7 +30,7 @@ let tasks = [
         category: "Other",
     },
 ];
-// let todos = ['Buy milk', 'Walk the dog']; 
+
 
 const taskList = document.getElementById('taskList');
 const newTaskInput = document.getElementById('newTaskInput');
