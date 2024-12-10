@@ -40,192 +40,311 @@ const sortCategory = document.getElementById('sortCategory');
 
 sortCategory.addEventListener('change', renderTasks);
 
+// const response = await fetch('http://localhost:3000/api/todos', { ... });
 
-function renderTasks() {
+
+// function renderTasks() {
+async function renderTasks() {
     taskList.innerHTML = ''; // Clear existing tasks
     completedTaskList.innerHTML = ''; // Clear existing completed tasks
 
     const selectedCategory = sortCategory.value;
-    // let uncompletedTasks = tasks.filter(task => {
-    //     return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
-    // });
-    // uncompletedTasks.sort((a, b) => a.name.localeCompare(b.name));
-    const uncompletedTasks = tasks.filter(task => {
-        return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
-    });
 
-    // tasks.forEach(task => {
-    uncompletedTasks.forEach(task => {
-        const li = document.createElement('li');
+        // Fetch tasks from the server based on the selected category
+    const url = selectedCategory === 'allCategory' 
+    ? 'http://localhost:3000/api/todos'
+    : `http://localhost:3000/api/category/${selectedCategory}`;
 
-        // Toggle checkbox for complete status
-        const toggleCheckbox = document.createElement('input');
-        toggleCheckbox.type = 'checkbox';
-        toggleCheckbox.checked = task.complete;
-        toggleCheckbox.addEventListener('change', () => {
-            task.complete = toggleCheckbox.checked; // Update the complete status
-            renderTasks(); 
-        });     
+    // try {
+    //     const response = await fetch(url);
+    //     const tasksFromServer = await response.json();
 
-        // #### EDIT IN LINE WITH SPAN ####
-        const taskName = document.createElement('span');
-        taskName.textContent = task.name;
-        // Line-through if complete
-        if (task.complete) {
+    //     const uncompletedTasks = tasksFromServer.filter(task => !task.complete);
+    //     const completedTasks = tasksFromServer.filter(task => task.complete);
+
+    //     uncompletedTasks.forEach(task => {
+    //         // Render the uncompleted tasks
+    //         const li = document.createElement('li');
+    //         li.textContent = task.name; 
+    //         taskList.appendChild(li);
+    //     });
+
+    //     completedTasks.forEach(task => {
+    //         // Render the completed tasks
+    //         const li = document.createElement('li');
+    //         li.textContent = task.name; 
+    //         completedTaskList.appendChild(li);
+    //     });
+    // } catch (error) {
+    //     console.error("Error fetching tasks:", error);
+    // }
+
+
+    try {
+
+        const uncompletedTasks = tasks.filter(task => {
+            return !task.complete && (selectedCategory === 'allCategory' || task.category === selectedCategory);
+        });
+    
+        // tasks.forEach(task => {
+        uncompletedTasks.forEach(task => {
+            const li = document.createElement('li');
+    
+            // Toggle checkbox for complete status
+            const toggleCheckbox = document.createElement('input');
+            toggleCheckbox.type = 'checkbox';
+            toggleCheckbox.checked = task.complete;
+            toggleCheckbox.addEventListener('change', () => {
+                task.complete = toggleCheckbox.checked; // Update the complete status
+                renderTasks(); 
+            });     
+    
+            // #### EDIT IN LINE WITH SPAN ####
+            const taskName = document.createElement('span');
+            taskName.textContent = task.name;
+            // Line-through if complete
+            if (task.complete) {
+                taskName.style.textDecoration = 'line-through'; 
+            }
+    
+            // Container for task text and checkbox
+            const taskTextContainer = document.createElement('div');
+            taskTextContainer.classList.add('task-text'); 
+            taskTextContainer.appendChild(toggleCheckbox);
+            taskTextContainer.appendChild(taskName);
+    
+            // Edit
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.classList.add('edit-btn')
+            editBtn.addEventListener('click', () => {
+                // Change name to an input feild for edits
+                const inputField = document.createElement('input');
+                inputField.value = task.name;
+                li.insertBefore(inputField, taskName); // Change input field before the task name
+                li.removeChild(taskName); // Remove the current task name
+    
+                // Save button
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Save';
+                saveBtn.classList.add('save-btn')
+                saveBtn.addEventListener('click', () => {
+                    const newName = inputField.value.trim();
+                    if (newName !== '') {
+                        task.name = newName;
+                        renderTasks(); // Re-render the tasks list with the updated name
+                    }
+                });
+    
+                li.appendChild(saveBtn); // Save button to the task item
+            });
+            // #### EDIT WITH PROMPT ####
+            // const li = document.createElement('li');
+            // li.textContent = task.name;
+    
+            // // Edit
+            // const editBtn = document.createElement('button');
+            // editBtn.textContent = 'Edit';
+            // editBtn.addEventListener('click', () => {
+            //     const newName = prompt("Edit task name:", task.name);
+            //     if (newName !== null && newName.trim() !== '') {
+            //         task.name = newName.trim();
+            //         renderTasks(); //Re-render updates
+            //     }
+            // })
+    
+    
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            // deleteBtn.textContent = 'X';
+            deleteBtn.addEventListener('click', () => {
+                tasks = tasks.filter(t => t !== task);
+                renderTasks(); //Re-render updates
+            });
+    
+            li.appendChild(toggleCheckbox)
+            li.appendChild(taskName);
+            li.appendChild(editBtn); 
+            li.appendChild(deleteBtn);
+    
+            // append to the appropriate list if complete or uncompleted
+            // if (task.complete) {
+            //     completedTaskList.appendChild(li); 
+            // } else {
+            //     taskList.appendChild(li); 
+            // }
+            taskList.appendChild(li);
+            
+        });
+        // ############ BASICALLY A COPY PASTE FROM ABOVE TO MAKE THE 
+        // ############ UNCOMPLETE WORK SEPERATELY FROM THE COMPLETE
+        // ############ SECTION, YET STILL BE ABLE TO INTERACT WITH EACH OTHER. 
+        // ############ TOOK WAY TO LONG BUT WORK IT. 
+        const completedTasks = tasks.filter(task => task.complete);
+    
+        completedTasks.forEach(task => {
+            const li = document.createElement('li');
+    
+            const toggleCheckbox = document.createElement('input');
+            toggleCheckbox.type = 'checkbox';
+            toggleCheckbox.checked = task.complete;
+            toggleCheckbox.addEventListener('change', () => {
+                task.complete = toggleCheckbox.checked; 
+                renderTasks(); 
+            });
+    
+            const taskName = document.createElement('span');
+            taskName.textContent = task.name;
             taskName.style.textDecoration = 'line-through'; 
-        }
-
-        // Container for task text and checkbox
-        const taskTextContainer = document.createElement('div');
-        taskTextContainer.classList.add('task-text'); 
-        taskTextContainer.appendChild(toggleCheckbox);
-        taskTextContainer.appendChild(taskName);
-
-        // Edit
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.classList.add('edit-btn')
-        editBtn.addEventListener('click', () => {
-            // Change name to an input feild for edits
-            const inputField = document.createElement('input');
-            inputField.value = task.name;
-            li.insertBefore(inputField, taskName); // Change input field before the task name
-            li.removeChild(taskName); // Remove the current task name
-
-            // Save button
-            const saveBtn = document.createElement('button');
-            saveBtn.textContent = 'Save';
-            saveBtn.classList.add('save-btn')
-            saveBtn.addEventListener('click', () => {
-                const newName = inputField.value.trim();
-                if (newName !== '') {
-                    task.name = newName;
-                    renderTasks(); // Re-render the tasks list with the updated name
-                }
+    
+            const taskTextContainer = document.createElement('div');
+            taskTextContainer.classList.add('task-text');
+            taskTextContainer.appendChild(toggleCheckbox);
+            taskTextContainer.appendChild(taskName);
+    
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.classList.add('edit-btn');
+            editBtn.addEventListener('click', () => {
+                const inputField = document.createElement('input');
+                inputField.value = task.name;
+                li.insertBefore(inputField, taskName);
+                li.removeChild(taskName);
+    
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Save';
+                saveBtn.classList.add('save-btn');
+                saveBtn.addEventListener('click', () => {
+                    const newName = inputField.value.trim();
+                    if (newName !== '') {
+                        task.name = newName;
+                        renderTasks(); 
+                    }
+                });
+    
+                li.appendChild(saveBtn);
             });
-
-            li.appendChild(saveBtn); // Save button to the task item
-        });
-        // #### EDIT WITH PROMPT ####
-        // const li = document.createElement('li');
-        // li.textContent = task.name;
-
-        // // Edit
-        // const editBtn = document.createElement('button');
-        // editBtn.textContent = 'Edit';
-        // editBtn.addEventListener('click', () => {
-        //     const newName = prompt("Edit task name:", task.name);
-        //     if (newName !== null && newName.trim() !== '') {
-        //         task.name = newName.trim();
-        //         renderTasks(); //Re-render updates
-        //     }
-        // })
-
-
-        // Delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        // deleteBtn.textContent = 'X';
-        deleteBtn.addEventListener('click', () => {
-            tasks = tasks.filter(t => t !== task);
-            renderTasks(); //Re-render updates
-        });
-
-        li.appendChild(toggleCheckbox)
-        li.appendChild(taskName);
-        li.appendChild(editBtn); 
-        li.appendChild(deleteBtn);
-
-        // append to the appropriate list if complete or uncompleted
-        // if (task.complete) {
-        //     completedTaskList.appendChild(li); 
-        // } else {
-        //     taskList.appendChild(li); 
-        // }
-        taskList.appendChild(li);
-        
-    });
-    // ############ BASICALLY A COPY PASTE FROM ABOVE TO MAKE THE 
-    // ############ UNCOMPLETE WORK SEPERATELY FROM THE COMPLETE
-    // ############ SECTION, YET STILL BE ABLE TO INTERACT WITH EACH OTHER. 
-    // ############ TOOK WAY TO LONG BUT WORK IT. 
-    const completedTasks = tasks.filter(task => task.complete);
-
-    completedTasks.forEach(task => {
-        const li = document.createElement('li');
-
-        const toggleCheckbox = document.createElement('input');
-        toggleCheckbox.type = 'checkbox';
-        toggleCheckbox.checked = task.complete;
-        toggleCheckbox.addEventListener('change', () => {
-            task.complete = toggleCheckbox.checked; 
-            renderTasks(); 
-        });
-
-        const taskName = document.createElement('span');
-        taskName.textContent = task.name;
-        taskName.style.textDecoration = 'line-through'; 
-
-        const taskTextContainer = document.createElement('div');
-        taskTextContainer.classList.add('task-text');
-        taskTextContainer.appendChild(toggleCheckbox);
-        taskTextContainer.appendChild(taskName);
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'Edit';
-        editBtn.classList.add('edit-btn');
-        editBtn.addEventListener('click', () => {
-            const inputField = document.createElement('input');
-            inputField.value = task.name;
-            li.insertBefore(inputField, taskName);
-            li.removeChild(taskName);
-
-            const saveBtn = document.createElement('button');
-            saveBtn.textContent = 'Save';
-            saveBtn.classList.add('save-btn');
-            saveBtn.addEventListener('click', () => {
-                const newName = inputField.value.trim();
-                if (newName !== '') {
-                    task.name = newName;
-                    renderTasks(); 
-                }
+    
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => {
+                tasks = tasks.filter(t => t !== task);
+                renderTasks(); 
             });
-
-            li.appendChild(saveBtn);
+    
+            li.appendChild(toggleCheckbox);
+            li.appendChild(taskName);
+            li.appendChild(editBtn);
+            li.appendChild(deleteBtn);
+    
+            completedTaskList.appendChild(li);
         });
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.addEventListener('click', () => {
-            tasks = tasks.filter(t => t !== task);
-            renderTasks(); 
-        });
-
-        li.appendChild(toggleCheckbox);
-        li.appendChild(taskName);
-        li.appendChild(editBtn);
-        li.appendChild(deleteBtn);
-
-        completedTaskList.appendChild(li);
-    });
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+    }
 }
+// } catch (error) {
+//     console.error("Error fetching tasks:", error);
+// }
 
-addTaskBtn.addEventListener('click', () => {
+addTaskBtn.addEventListener('click', async () => {
     const newTask = newTaskInput.value.trim();
     const selectedCategory = document.getElementById('selectCategory').value;
     const errorMessageDiv = document.getElementById('error-message');
+    
     if (newTask !== '' && selectedCategory !== '') {
-        tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: selectedCategory });
-        newTaskInput.value = ''; 
-        document.getElementById('selectCategory').value = ''; 
-        renderTasks(); 
+        try {
+            const response = await fetch('http://localhost:3000/api/todo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: newTask,
+                    category: selectedCategory
+                })
+            });
 
-        errorMessageDiv.style.display = 'none';
+            if (response.ok) {
+                const addedTask = await response.json();
+                tasks.push(addedTask); // Add the new task to your local array
+                renderTasks(); // Re-render tasks with the updated list
+                newTaskInput.value = ''; // Clear the input field
+                document.getElementById('selectCategory').value = ''; // Reset category dropdown
+                errorMessageDiv.style.display = 'none';
+            } else {
+                const error = await response.json();
+                errorMessageDiv.textContent = error.message;
+                errorMessageDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Error adding task:", error);
+        }
     } else {
         errorMessageDiv.textContent = "Please enter a task and select a category!";
-        errorMessageDiv.style.display = 'block'; 
+        errorMessageDiv.style.display = 'block';
     }
 });
+
+// addTaskBtn.addEventListener('click', () => {
+//     const newTask = newTaskInput.value.trim();
+//     const selectedCategory = document.getElementById('selectCategory').value;
+//     const errorMessageDiv = document.getElementById('error-message');
+//     if (newTask !== '' && selectedCategory !== '') {
+//         tasks.push({ id: tasks.length + 1, name: newTask, complete: false, category: selectedCategory });
+//         newTaskInput.value = ''; 
+//         document.getElementById('selectCategory').value = ''; 
+//         renderTasks(); 
+
+//         errorMessageDiv.style.display = 'none';
+//     } else {
+//         errorMessageDiv.textContent = "Please enter a task and select a category!";
+//         errorMessageDiv.style.display = 'block'; 
+//     }
+// });
+
+async function updateTask(id, updatedData) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/todos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedData)
+        });
+
+        if (response.ok) {
+            const updatedTask = await response.json();
+            tasks = tasks.map(task => task.id === id ? updatedTask : task); // Update task locally
+            renderTasks(); // Re-render tasks with updated data
+        } else {
+            const error = await response.json();
+            console.error("Error updating task:", error);
+        }
+    } catch (error) {
+        console.error("Error updating task:", error);
+    }
+}
+async function deleteTask(id) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/todos/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok) {
+            tasks = tasks.filter(task => task.id !== id); // Remove task from local array
+            renderTasks(); // Re-render tasks after deletion
+        } else {
+            console.error("Failed to delete task");
+        }
+    } catch (error) {
+        console.error("Error deleting task:", error);
+    }
+}
+
+
+
 // enter key works here
 newTaskInput.addEventListener('keydown', (event) => {
     const newTask = newTaskInput.value.trim();

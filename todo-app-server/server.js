@@ -3,9 +3,14 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3000;
 
+const cors = require('cors');
+app.use(cors());  // This will allow cross-origin requests
+
 app.use(express.json()); // for parsing JSON data
 app.use(express.urlencoded({ extended: true })); // for parsing from data
 app.use(bodyParser.json()); // Middleware to parse JSON bodies
+
+// app.post('/api/todo', (req, res) => { ... });
 
 let tasks = [
     { 
